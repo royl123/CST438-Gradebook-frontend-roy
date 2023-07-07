@@ -80,27 +80,30 @@ class Assignment extends React.Component {
     return (
       <div align="left">
         <h4>Assignment(s) ready to grade: </h4>
-        <Button
-          variant="outlined"
-          color="success"
-          component={Link}
-          to={{ pathname: "/new-assignment" }}
-        >
-          Add new assignment
-        </Button>
-        <div style={{ height: 450, width: "100%", align: "left" }}>
+        <div style={{ height: 325, width: "100%", align: "left" }}>
           <DataGrid rows={this.state.assignments} columns={columns} />
         </div>
-        <Button
-          component={Link}
-          to={{ pathname: "/gradebook", assignment: assignmentSelected }}
-          variant="outlined"
-          color="primary"
-          disabled={this.state.assignments.length === 0}
-          style={{ margin: 10 }}
-        >
-          Grade
-        </Button>
+        <div style={{ textAlign: "center" }}>
+          <Button
+            component={Link}
+            to={{ pathname: "/gradebook", assignment: assignmentSelected }}
+            variant="outlined"
+            color="primary"
+            disabled={this.state.assignments.length === 0}
+            style={{ margin: 10 }}
+          >
+            Grade
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="success"
+            component={Link}
+            to={{ pathname: "/new-assignment" }}
+          >
+            Add new assignment
+          </Button>
+        </div>
         <ToastContainer autoClose={1500} />
       </div>
     );

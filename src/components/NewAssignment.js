@@ -1,27 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { SERVER_URL } from '../constants.js';
-import Cookies from 'js-cookie';
+import React, { useState, useEffect } from "react";
+import { SERVER_URL } from "../constants.js";
+import Cookies from "js-cookie";
 
 const NewAssignment = () => {
-  const [name, setName] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [course, setCourse] = useState('');
+  const [name, setName] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [course, setCourse] = useState("");
   const [courses, setCourses] = useState([]);
-  const token = Cookies.get('XSRF-TOKEN');
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const token = Cookies.get("XSRF-TOKEN");
 
   useEffect(() => {
     // Fetch the list of courses
     fetch(`${SERVER_URL}/gradebook`, {
-      method: 'GET',
-      headers: { 'X-XSRF-TOKEN': token },
+      method: "GET",
+      headers: { "X-XSRF-TOKEN": token },
     })
       .then((response) => response.json())
       .then((data) => {
-        const uniqueCourses = [...new Map(data.assignments.map((courseObj) => [courseObj.courseId, courseObj])).values()];
+        const uniqueCourses = [
+          ...new Map(
+            data.assignments.map((courseObj) => [courseObj.courseId, courseObj])
+          ).values(),
+        ];
         setCourses(uniqueCourses);
       })
       .catch((error) => {
-        console.error('Error fetching courses:', error);
+        console.error("Error fetching courses:", error);
       });
   }, []);
 
@@ -29,40 +35,53 @@ const NewAssignment = () => {
     e.preventDefault();
 
     // Find the selected course object based on the course title
-    const selectedCourse = courses.find((courseObj) => courseObj.courseTitle === course);
+    const selectedCourse = courses.find(
+      (courseObj) => courseObj.courseTitle === course
+    );
 
     if (!selectedCourse) {
-      console.error('Selected course not found.');
+      console.error("Selected course not found.");
       return;
     }
 
     const assignmentData = {
-      name,
+      assignmentName: name,
       dueDate,
-      course: selectedCourse.courseId,
+      courseTitle: selectedCourse.courseTitle,
+      courseId: selectedCourse.courseId,
     };
 
+    console.log("Assignment data:", assignmentData);
+
     // Make the POST request
-    fetch(`${SERVER_URL}/courses/${selectedCourse.courseId}/assignments`, {
-      method: 'POST',
+    fetch(`${SERVER_URL}/course/${selectedCourse.courseId}/assignments`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'X-XSRF-TOKEN': token,
+        "Content-Type": "application/json",
+        "X-XSRF-TOKEN": token,
       },
       body: JSON.stringify(assignmentData),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          setSuccessMessage("Assignment added!");
+            // Clear the form after successful submission
+          setName("");
+          setDueDate("");
+          setCourse("");
+          return response.json();
+        } else {
+          setErrorMessage("Error encountered");
+          throw new Error("Error encountered");
+        }
+      })
       .then((data) => {
-        console.log('Assignment created:', data);
-
-        // Clear the form after successful submission
-        setName('');
-        setDueDate('');
-        setCourse('');
+        console.log("Assignment created:", data);
       })
       .catch((error) => {
-        console.error('Error creating assignment:', error);
+        if (error.message !== "SyntaxError: Unexpected end of JSON input") {
+          console.error("Error encountered: ", error);
+        }
       });
   };
 
@@ -80,34 +99,46 @@ const NewAssignment = () => {
           />
         </div>
         <div>
-          <br/>
+          <br />
           <label htmlFor="dueDate">Due Date: </label>
           <input
             type="text"
             id="dueDate"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
+            placeholder="yyyy-mm-dd"
           />
         </div>
         <div>
-          <br/>
+          <br />
           <label htmlFor="course">Course:</label>
-          {courses.map((courseObj) => (
-            <div key={courseObj.courseId}>
-              <input
-                type="radio"
-                id={courseObj.courseId}
-                name="course"
-                value={courseObj.courseTitle}
-                checked={course === courseObj.courseTitle}
-                onChange={(e) => setCourse(e.target.value)}
-              />
-              <label htmlFor={courseObj.courseId}>{courseObj.courseTitle}</label>
-            </div>
-          ))}
+          {courses.length > 0 ? (
+            courses.map((courseObj) => (
+              <div key={courseObj.courseId}>
+                <input
+                  type="radio"
+                  id={courseObj.courseId}
+                  name="course"
+                  value={courseObj.courseTitle}
+                  checked={course === courseObj.courseTitle}
+                  onChange={(e) => setCourse(e.target.value)}
+                />
+                <label htmlFor={courseObj.courseId}>
+                  {courseObj.courseTitle}
+                </label>
+              </div>
+            ))
+          ) : (
+            <div>No courses available</div>
+          )}
         </div>
         <br />
         <button type="submit">Create Assignment</button>
+        <br />
+        {successMessage && <p style={{ color: 'green', fontWeight: 'bold'}}>{successMessage}</p>}
+        {errorMessage && <p style={{ color: 'red', fontWeight: 'bold'}}>{errorMessage}</p>}
+        <br />
+        <a style={{ fontWeight: 'bold'}} href="/"> Go back to homepage</a>
       </form>
     </div>
   );
