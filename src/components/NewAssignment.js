@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { SERVER_URL } from "../constants.js";
 import Cookies from "js-cookie";
+import Button from "@mui/material/Button";
 
 const NewAssignment = () => {
   const [name, setName] = useState("");
@@ -29,7 +30,7 @@ const NewAssignment = () => {
       .catch((error) => {
         console.error("Error fetching courses:", error);
       });
-  }, []);
+  }, [token]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -133,12 +134,11 @@ const NewAssignment = () => {
           )}
         </div>
         <br />
-        <button type="submit">Create Assignment</button>
+        <Button variant="outlined" color="success"type="submit">Create Assignment</Button>
         <br />
         {successMessage && <p style={{ color: 'green', fontWeight: 'bold'}}>{successMessage}</p>}
         {errorMessage && <p style={{ color: 'red', fontWeight: 'bold'}}>{errorMessage}</p>}
         <br />
-        <a style={{ fontWeight: 'bold'}} href="/"> Go back to homepage</a>
       </form>
     </div>
   );

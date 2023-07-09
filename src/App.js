@@ -13,7 +13,7 @@ function App() {
       <AppBar position="static" color="default">
         <Toolbar>
            <Typography variant="h6" color="inherit">
-            Gradebook
+            <a style={{ fontWeight: 'bold', textDecoration: 'none'}} href="/"> Gradebook </a>
            </Typography>
         </Toolbar>
       </AppBar>
