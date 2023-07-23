@@ -110,7 +110,7 @@ const NewAssignment = () => {
             placeholder="yyyy-mm-dd"
           />
         </div>
-        <div>
+        <div id="course-selector">
           <br />
           <label htmlFor="course">Course:</label>
           {courses.length > 0 ? (
@@ -134,7 +134,7 @@ const NewAssignment = () => {
           )}
         </div>
         <br />
-        <Button variant="outlined" color="success"type="submit">Create Assignment</Button>
+        <Button id="create-assignment" variant="outlined" color="success"type="submit">Create Assignment</Button>
         <br />
         {successMessage && <p style={{ color: 'green', fontWeight: 'bold'}}>{successMessage}</p>}
         {errorMessage && <p style={{ color: 'red', fontWeight: 'bold'}}>{errorMessage}</p>}

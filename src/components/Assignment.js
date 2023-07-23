@@ -96,6 +96,7 @@ class Assignment extends React.Component {
           </Button>
 
           <Button
+            id="create-new-assignment"
             variant="outlined"
             color="success"
             component={Link}
